@@ -1,0 +1,38 @@
+
+1. In the fragment shader implement the Phong diffuse lighting model:
+
+a) You will need a vector describing the direction of incoming light
+- Send a variable "uniform vec3" from OpenGL to the fragment shader which defines the light direction.
+- This is analogous to the way "objectColor" is transmitted to the fragment shader. However, we assume that the light source is far away and we can use the same light direction for all objects. Thus, we need to transmit the light direction only once to the shader.
+- Choose a unit vector of your choice as the light direction.
+
+b) Calculate light intensity:
+- Intensity = Dot product between surface normal and inverse light direction. Intensity is therefore a scalar variable.
+- Light intensity cannot be negative. Therfore clamp it to the range: x = max(x, 0.0). Revisit the lecture notes if unclear wich equation to use. 
+- All vectors have to be normalized.
+
+c) Use the computed light intensity to modify the color of the object:
+- Multiply the color of the object with the light intensity to obtain the shaded object color.
+
+
+2. Why is the shading not changing with object orientation? Answer the question for yourself before you continue reading the exercise.
+
+
+All vertex normal vectors have to be transformed into world space:
+- Send the model matrix of the object drawn as a separate variable to the vertex shader (uniform mat4).
+- Multiply the normal vector in the shader with the model matrix before sending it to the fragment shader.
+- The 'w' coordinate of the normal vector has to be set to 0 before multipication with the model matrix. This is because the normal vector is a direction and not a point in homogeneous coordinates. We do not want to translate it during homogenization.
+
+
+3. Add specular Phong lighting to the model.
+
+a) Define a vector describing the view direction (it depends on the surface and camera positions):
+- Send the camera position (cameraPos) as another variable to the fragment shader.
+- Analogously to the normal vectors of the vertex shader, send the vertex positions from vertex to fragment shader (vertexPosition) in world space (multiplied with the modelMatrix). This time around the vectors represent points and not directions - the 'w' coordinate of the vertex positions has to be set to 1.
+- Compute the view direction in the fragment shader using the sent vertex and camera positions
+
+b) Calculate the light intensity due to specular lighting:
+- Obtain the reflected light direction R using the glsl function reflect.
+- Calculate the light intensity using the appropriate equation given in the lecture notes.
+
+c) The shaded pixel color is:  objectColor * diffuse + vec3(1.0) * specular. This describes the simplest case when the reflected light color is white.
